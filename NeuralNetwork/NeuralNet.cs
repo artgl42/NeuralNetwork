@@ -15,7 +15,7 @@ namespace NeuralNetwork
     // TODO: проверку параметров в классе Settings -> CreateNeuralNet
     // TODO: методы обработки различных форматов данных для загружаемого датасета
 
-    public enum InitializerWeights { Zeros, Ones, Random, XavierUniform }
+    public enum InitializerWeights { Random, Zeros, Ones, XavierUniform }
     public enum InitializerBias { Zeros, Ones, Random }
     public enum ActivationFunc { Sigmoid, TanH, Identity, ReLU, Gaussian }
     public enum LossFunc { MSE, RootMSE, Arctan }
@@ -45,10 +45,10 @@ namespace NeuralNetwork
         public uint LearningCounter { get; private set; }
 
         #region ----- Constructor (Fluent Builder) ----- 
-        private NeuralNet(Settings settings)
+        private NeuralNet(Builder settings)
         {
             ActivationFunc = settings.ActivationFunc;
-            LearningOptimizing = settings.LearningOptimizing;
+            LearningOptimizing = settings.LearningOptimizing ?? default(LearningOptimizing);
             LearningRate = settings.LearningRate ?? _defaultLearningRate;
             MomentumRate = settings.MomentumRate ?? _defaultMomentumRate;
             LossFunc = settings.ErrorFunc;
@@ -61,7 +61,7 @@ namespace NeuralNetwork
             _NeuralLayers = layersFactory.CreateLayers();
         }
 
-        public class Settings
+        public class Builder
         {
             public uint InputNeurons { get; set; }
             public List<uint> NeuronLayers { get; set; }
@@ -74,67 +74,67 @@ namespace NeuralNetwork
             public LossFunc ErrorFunc { get; private set; }
             public LearningOptimizing? LearningOptimizing { get; private set; } = null;
 
-            public Settings()
+            public Builder()
             {
                 NeuronLayers = new List<uint>();
             }
 
-            public Settings SetNeuronsInputLayer(uint inputNeurons)
+            public Builder SetNeuronsInputLayer(uint inputNeurons)
             {
                 InputNeurons = inputNeurons;
                 return this;
             }
 
-            public Settings SetNeuronsForLayers(params uint[] neuronLayers)
+            public Builder SetNeuronsForLayers(params uint[] neuronLayers)
             {
                 NeuronLayers.AddRange(neuronLayers);
                 return this;
             }
 
-            public Settings SetBiasNeurons(bool isBiasNeurons, InitializerBias biasInitializer = default(InitializerBias))
+            public Builder SetBiasNeurons(bool isBiasNeurons, InitializerBias biasInitializer = default(InitializerBias))
             {
                 IsBiasNeurons = isBiasNeurons;
                 BiasInitializer = biasInitializer;
                 return this;
             }
 
-            public Settings SetLearningRate(float LearningRate)
+            public Builder SetLearningRate(float LearningRate)
             {
                 this.LearningRate = LearningRate;
                 return this;
             }
 
-            public Settings SetMomentumRate(float MomentumRate)
+            public Builder SetMomentumRate(float MomentumRate)
             {
                 this.MomentumRate = MomentumRate;
                 return this;
             }
 
-            public Settings SetWeightsInitializer(InitializerWeights weightsInitializer)
+            public Builder SetWeightsInitializer(InitializerWeights weightsInitializer)
             {
                 WeightsInitializer = weightsInitializer;
                 return this;
             }
 
-            public Settings SetActivationFunc(ActivationFunc activationFunc)
+            public Builder SetActivationFunc(ActivationFunc activationFunc)
             {
                 ActivationFunc = activationFunc;
                 return this;
             }
 
-            public Settings SetLossFunc(LossFunc errorFunc)
+            public Builder SetLossFunc(LossFunc errorFunc)
             {
                 ErrorFunc = errorFunc;
                 return this;
             }
 
-            public Settings SetLearningOptimizing(LearningOptimizing learningOptimizing)
+            public Builder SetLearningOptimizing(LearningOptimizing learningOptimizing)
             {
                 LearningOptimizing = learningOptimizing;
                 return this;
             }
 
-            public NeuralNet Create()
+            public NeuralNet Build()
             {
                 return new NeuralNet(this);
             }
@@ -156,7 +156,7 @@ namespace NeuralNetwork
             return CalculateError(inputSignals, expectedSignals);
         }
 
-        public void Learn(float[][] inputSignals, float[][] expectedSignals, double loss = 0.01)
+        public void Learn(float[][] inputSignals, float[][] expectedSignals, double acceptLoss)
         {
             float _currentLoss;
             OnActivationNeuralNet(inputSignals);
@@ -164,7 +164,7 @@ namespace NeuralNetwork
             {
                 LearningProcess(inputSignals, expectedSignals);
                 _currentLoss = CalculateError(inputSignals, expectedSignals);
-            } while (_currentLoss > loss);
+            } while (_currentLoss > acceptLoss);
         }
 
         public IEnumerable<float> Learn(float[][] inputSignals, float[][] expectedSignals, uint epochsCount, uint returnLossPeriod = 100)
@@ -177,7 +177,7 @@ namespace NeuralNetwork
             }
         }
 
-        public IEnumerable<float> Learn(float[][] inputSignals, float[][] expectedSignals, double loss = 0.01, uint returnLossPeriod = 100)
+        public IEnumerable<float> Learn(float[][] inputSignals, float[][] expectedSignals, double acceptLoss = 0.01, uint returnLossPeriod = 100)
         {
             float _currentLoss;
             OnActivationNeuralNet(inputSignals);
@@ -186,7 +186,7 @@ namespace NeuralNetwork
                 LearningProcess(inputSignals, expectedSignals);
                 _currentLoss = CalculateError(inputSignals, expectedSignals);
                 if (LearningCounter % returnLossPeriod == 0) yield return _currentLoss;           
-            } while (_currentLoss > loss);
+            } while (_currentLoss > acceptLoss);
         }
 
         public float CalculateError(float[][] inputSignals, float[][] expectedSignals)
