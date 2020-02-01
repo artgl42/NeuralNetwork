@@ -19,7 +19,7 @@ namespace NeuralNetwork
     public enum InitializerBias { Zeros, Ones, Random }
     public enum ActivationFunc { Sigmoid, TanH, Identity, ReLU, Gaussian }
     public enum LossFunc { MSE, RootMSE, Arctan }
-    public enum LearningOptimizing { NAG }
+    public enum LearningOptimizing { SGDM }
 
     [Serializable]
     public class NeuralNet : INeuralNet
@@ -51,7 +51,7 @@ namespace NeuralNetwork
             LearningOptimizing = settings.LearningOptimizing ?? default(LearningOptimizing);
             LearningRate = settings.LearningRate ?? _defaultLearningRate;
             MomentumRate = settings.MomentumRate ?? _defaultMomentumRate;
-            LossFunc = settings.ErrorFunc;
+            LossFunc = settings.LossFunc;
             var layersFactory = new NeuralLayerFactory(
                 settings.InputNeurons, 
                 settings.NeuronLayers.ToArray(), 
@@ -71,7 +71,7 @@ namespace NeuralNetwork
             public InitializerWeights WeightsInitializer { get; set; }
             public InitializerBias BiasInitializer { get; set; }
             public ActivationFunc ActivationFunc { get; private set; }
-            public LossFunc ErrorFunc { get; private set; }
+            public LossFunc LossFunc { get; private set; }
             public LearningOptimizing? LearningOptimizing { get; private set; } = null;
 
             public Builder()
@@ -98,15 +98,15 @@ namespace NeuralNetwork
                 return this;
             }
 
-            public Builder SetLearningRate(float LearningRate)
+            public Builder SetLearningRate(float learningRate)
             {
-                this.LearningRate = LearningRate;
+                this.LearningRate = learningRate;
                 return this;
             }
 
-            public Builder SetMomentumRate(float MomentumRate)
+            public Builder SetMomentumRate(float momentumRate)
             {
-                this.MomentumRate = MomentumRate;
+                this.MomentumRate = momentumRate;
                 return this;
             }
 
@@ -122,9 +122,9 @@ namespace NeuralNetwork
                 return this;
             }
 
-            public Builder SetLossFunc(LossFunc errorFunc)
+            public Builder SetLossFunc(LossFunc lossFunc)
             {
-                ErrorFunc = errorFunc;
+                LossFunc = lossFunc;
                 return this;
             }
 

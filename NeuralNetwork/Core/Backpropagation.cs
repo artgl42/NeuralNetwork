@@ -103,7 +103,7 @@ namespace NeuralNetwork.Core
                     case null:
                         _updateForWeight = gradientsForWeights[synapse][neuron] * learningRate;
                         break;
-                    case LearningOptimizing.NAG:
+                    case LearningOptimizing.SGDM:
                         _updateForWeight = gradientsForWeights[synapse][neuron] * learningRate + prevUpdatesForWeights[synapse][neuron] * momentumRate;
                         break;
                 }
@@ -132,7 +132,7 @@ namespace NeuralNetwork.Core
                     case null:
                         _updateForWeight = deltasErrorThisLayer[neuron] * learningRate;
                         break;
-                    case LearningOptimizing.NAG:
+                    case LearningOptimizing.SGDM:
                         _updateForWeight = deltasErrorThisLayer[neuron] * learningRate + prevUpdatesForBias[neuron] * momentumRate;
                         break;
                 }

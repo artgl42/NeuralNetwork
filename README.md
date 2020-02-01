@@ -7,47 +7,51 @@ This is .NET library that implements functionality for creating and training neu
 * Loss functions: MSE, Arctan, RootMSE.
 * Method for initializing the neuron weights: Zeros, Ones, Random, XavierUniform.
 * Method for initializing the bias neurons (output signal): Zeros, Ones, Random.
-* Method for optimizing of training: Nesterov Accelerated Gradient (NAG).
+* Method for optimizing of training: Stochastic Gradient Descent with Momentum (SGDM).
 
 ## API
 
 ### NeuralNet.Builder Class ([fluent interface](https://en.wikipedia.org/wiki/Fluent_interface))
 
-> Provides methods for creating and initially configuring a neural network.
+Provides methods for creating and initially configuring a neural network.
 
-Methods               | Parameters                         | Description
-:-------------------- | :--------------------------------: |:------------
-SetNeuronsInputLayer  | **uint**                           | The number of neurons (sensors) for the input layer (don't have weights and don't participate in training). This setting determines the size of the input dataset. **Without this parameter, a neural network cannot be created**.
-SetNeuronsForLayers   | **params uint[]**                  | The numbers of neurons for the other layers. For example: `.SetNeuronsForLayers(5, 10, 4)` - 3 hidden layers of 5, 10, and 4 neurons will be created behind the input layer. **Without this parameter, a neural network cannot be created**.
-SetWeightsInitializer | **enum InitializerWeights**        | Method for initializing the weight of neurons in all layers. For example: `.SetWeightsInitializer(InitializerWeights.XavierUniform)`. The default value is **InitializerWeights.Random**.
-SetBiasNeurons        | **bool**, **enum InitializerBias** | The first parameter (**isBiasNeurons**) is responsible for using / not using bias. The second parameter is responsible for the method of initializing [bias neurons](https://en.wikipedia.org/wiki/Machine_learning#Bias). The default value is **false**.
-SetActivationFunc     | **enum ActivationFunc**            | Initial setting of the [activation function](https://en.wikipedia.org/wiki/Activation_function). The default value is **ActivationFunc.Sigmoid**.
-SetLearningOptimizing | **enum LearningOptimizing**        | Initial setting of the [optimization method](https://en.wikipedia.org/wiki/Stochastic_gradient_descent) for training neural networks. The default value is **LearningOptimizing.NAG**.
-SetLossFunc           | **enum LossFunc**                  | Initial setting of the [loss functions](https://en.wikipedia.org/wiki/Loss_function ). The default value is **LossFunc.MSE**.
-SetLearningRate       | **float**                          | Initial setting of the [learning rate](https://en.wikipedia.org/wiki/Learning_rate). The default value is **0.1**.
-SetMomentumRate       | **float**                          | Initial setting of the [momentum rate](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum). The default value is **0.9**.
+Methods               | Parameters                                                       | Description
+:-------------------- | :--------------------------------------------------------------: |:------------
+SetNeuronsInputLayer  | **uint** inputNeurons                                            | The number of neurons (sensors) for the input layer (don't have weights and don't participate in training). This setting determines the size of the input dataset. **Without this parameter, a neural network cannot be created**.
+SetNeuronsForLayers   | **params uint[]** neuronLayers                                   | The numbers of neurons for the other layers. For example: `.SetNeuronsForLayers(5, 10, 4)` - 2 hidden layers (5 and 10 neurons) and output layer (4 neurons) will be created behind the input layer. **Without this parameter, a neural network cannot be created**.
+SetWeightsInitializer | **enum InitializerWeights** weightsInitializer                   | Method for initializing the weight of neurons in all layers. For example: `.SetWeightsInitializer(InitializerWeights.XavierUniform)`. The default value is **InitializerWeights.Random**.
+SetBiasNeurons        | **bool** isBiasNeurons, **enum InitializerBias** biasInitializer | The first parameter is responsible for using / not using bias. The second parameter is responsible for the method of initializing [bias neurons](https://en.wikipedia.org/wiki/Machine_learning#Bias). The default value is **false**.
+SetActivationFunc     | **enum ActivationFunc** activationFunc                           | Initial setting of the [activation function](https://en.wikipedia.org/wiki/Activation_function). The default value is **ActivationFunc.Sigmoid**.
+SetLearningOptimizing | **enum LearningOptimizing** learningOptimizing                   | Initial setting of the [optimization method](https://en.wikipedia.org/wiki/Stochastic_gradient_descent) for training neural networks. The default value is **LearningOptimizing.SGDM**.
+SetLossFunc           | **enum LossFunc** lossFunc                                       | Initial setting of the [loss function](https://en.wikipedia.org/wiki/Loss_function ). The default value is **LossFunc.MSE**.
+SetLearningRate       | **float** learningRate                                           | Initial setting of the [learning rate](https://en.wikipedia.org/wiki/Learning_rate). The default value is **0.1**.
+SetMomentumRate       | **float** momentumRate                                           | Initial setting of the [momentum rate](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum). The default value is **0.9**.
 
-### NeuralNet Class
+### NeuralNet Class (properties)
 
-> Provides properties and methods for using a neural network.
+Provides properties for using a neural network.
 
 Properties         | Type                        | Description
 :----------------- |:---------------------------:| :------------
-ActivationFunc     | **enum ActivationFunc**     | Get / Set the [activation function](https://en.wikipedia.org/wiki/Activation_function).
-LearningOptimizing | **enum LearningOptimizing** | Get / Set the [optimization method](https://en.wikipedia.org/wiki/Stochastic_gradient_descent).
-LossFunc           | **enum LossFunc**           | Get / Set the [loss functions](https://en.wikipedia.org/wiki/Loss_function).
-LearningRate       | **float**                   | Get / Set the [learning rate](https://en.wikipedia.org/wiki/Learning_rate).
-MomentumRate       | **float**                   | Get / Set the [momentum rate](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum).
+ActivationFunc     | **enum ActivationFunc**     | Get / Set [activation function](https://en.wikipedia.org/wiki/Activation_function).
+LearningOptimizing | **enum LearningOptimizing** | Get / Set [optimization method](https://en.wikipedia.org/wiki/Stochastic_gradient_descent).
+LossFunc           | **enum LossFunc**           | Get / Set [loss function](https://en.wikipedia.org/wiki/Loss_function).
+LearningRate       | **float**                   | Get / Set [learning rate](https://en.wikipedia.org/wiki/Learning_rate).
+MomentumRate       | **float**                   | Get / Set [momentum rate](https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum).
 LearningCounter    | **uint**                    | Get the number of training epochs completed.
+
+### NeuralNet Class (methods)
+
+Provides methods for using a neural network.
 
 Methods            | Signature                                                     | Description
 :----------------- | :------------------------------------------------------------:|:------------
-Activate           | **float[][] Activate (float[][])**                            | The command activates the neural network by using the input dataset and returning the output dataset.
-Learn              | **float Learn (float[][], float[][], uint)**                  | The command trains the neural network up to the number of epochs. **Takes** the input parameters: the **input dataset** (first parameter), the **expected output signals** (second parameter) and the **number of training epochs** (third parameter). Returns the **current error** after training.
-Learn              | **void (float[][], float[][], double)**                       | The command trains the neural network to a certain accuracy. **Takes** the input parameters: the **input dataset** (first parameter), the **expected output signals** (second parameter) and the **acceptable loss** (third parameter). The lower the loss, the better a train. For example: `.Learn(inputSignal, expectedSignals, 0.01)` - trains the neural network up to 99% accuracy.
-Learn              | **IEnumerable\<float> (float[][], float[][], uint, uint)**    | The command trains the neural network up to the number of epochs and returns the result in periods. **Takes** the input parameters: the **input dataset** (first parameter), the **expected output signals** (second parameter), the **number of training epochs** (third parameter) and the **number of training epochs to return the result** (fourth parameter). Returns the **current error** after training.
-Learn              | **IEnumerable\<float> (float[][], float[][], double, uint);** | The command trains the neural network to a certain accuracy and returns the result in periods. **Takes** the input parameters: the **input dataset** (first parameter), the **expected output signals** (second parameter), the **acceptable loss** (third parameter) and the **number of training epochs to return the result** (fourth parameter). Returns the **current error** after training.
-CalculateError     | **float (float[][], float[][])**                              | Calculates and returns the current error of the neural network. **Takes** the input parameters: the **input dataset** (first parameter) and the **expected output signals** (second parameter). Returns the **current error**.
+Activate           | **float[][] Activate (float[][])**                            | The command activates the neural network using the input dataset and returns the output dataset.
+Learn              | **float Learn (float[][], float[][], uint)**                  | The command trains the neural network up to the number of epochs. **Takes** the input parameters: **input dataset** (first parameter), **expected output signals** (second parameter) and **number of training epochs** (third parameter). Returns the **current error** after training.
+Learn              | **void (float[][], float[][], double)**                       | The command trains the neural network to a certain accuracy. **Takes** the input parameters: **input dataset** (first parameter), **expected output signals** (second parameter) and  **acceptable loss** (third parameter). The lower the loss, the better a train. For example: `.Learn(inputSignal, expectedSignals, 0.01)` - trains the neural network up to 99% accuracy.
+Learn              | **IEnumerable\<float> (float[][], float[][], uint, uint)**    | The command trains the neural network up to the number of epochs and returns the result in periods. **Takes** the input parameters: **input dataset** (first parameter), **expected output signals** (second parameter), **number of training epochs** (third parameter) and **number of training epochs to return the result** (fourth parameter). Returns the **current error** after training.
+Learn              | **IEnumerable\<float> (float[][], float[][], double, uint);** | The command trains the neural network to a certain accuracy and returns the result in periods. **Takes** the input parameters: **input dataset** (first parameter), **expected output signals** (second parameter), **acceptable loss** (third parameter) and **number of training epochs to return the result** (fourth parameter). Returns the **current error** after training.
+CalculateError     | **float (float[][], float[][])**                              | Calculates and returns the current error of the neural network. **Takes** the input parameters: **input dataset** (first parameter) and **expected output signals** (second parameter). Returns the **current error**.
 
 ## How To Use
 
@@ -67,19 +71,19 @@ The second step is to create a neural network. To do this, use the methods in th
  var neuralNet = new NeuralNet.Builder()
                     .SetNeuronsInputLayer(2) // Select the number of neurons (sensors) for the input layer
                     .SetNeuronsForLayers(3, 5, 1) // Select the number of neurons for the other layers
-                    .SetWeightsInitializer(InitializerWeights.Random) // Select the method for assigning an initial value for the weight of neurons
-                    .SetBiasNeurons(true, InitializerBias.Ones) // Select the method for assigning an initial value for bias neurons
-                    .SetActivationFunc(ActivationFunc.Sigmoid) // Select the activation function
-                    .SetLearningOptimizing(LearningOptimizing.NAG) // Select the method for optimizing neural network training
-                    .SetLossFunc(LossFunc.MSE) // Select the loss function
-                    .SetLearningRate(0.1F) // Select the learning rate
-                    .SetMomentumRate(0.9F) // Select the momentum rate
+                    .SetWeightsInitializer(InitializerWeights.Random) // Select a method for assigning an initial value for the weight of neurons
+                    .SetBiasNeurons(true, InitializerBias.Ones) // Select a method for assigning an initial value for bias neurons
+                    .SetActivationFunc(ActivationFunc.Sigmoid) // Select an activation function
+                    .SetLearningOptimizing(LearningOptimizing.NAG) // Select a method for optimizing neural network training
+                    .SetLossFunc(LossFunc.MSE) // Select a loss function
+                    .SetLearningRate(0.1F) // Select a learning rate
+                    .SetMomentumRate(0.9F) // Select a momentum rate
                     .Build(); // Build the neural network
 ```
 
 ### **Step 3**
 
-The next step is to prepare the datasets for training. Currently, you can only use an jagged array (float) for dataset:
+The next step is to prepare the datasets for training. Currently, you can only use a jagged array (float) for dataset:
 
 ```C#
 float[][] inputsSignals = ...; // Your own input dataset parser
