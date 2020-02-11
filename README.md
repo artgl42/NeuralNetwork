@@ -57,11 +57,15 @@ CalculateError     | **float (float[][], float[][])**                           
 
 ### **Step 1**
 
-Add this project to any of your projects, using the **Solution Explorer -> Add -> Existing Project** by right-clicking on the **Solution Explorer**.
+1. Add this project to any of your projects, using the **Solution Explorer -> Add -> Existing Project** by right-clicking on the **Solution Explorer**.
 
 or
 
-Build this project, using the **Solution Explorer -> Build Solution** by right-clicking on the **Solution Explorer**. Copy the created **NeuralNetwork.dll** file to the folder of your project, where the executable file (.exe) is located. Then add reference to **NeuralNetwork.dll** file, using the **Reference -> Add Reference** by right-clicking on the **Reference** in **Solution Explorer**.
+1. Build this project, using the **Solution Explorer -> Build Solution** by right-clicking on the **Solution Explorer**.
+
+2. Copy the created **NeuralNetwork.dll** file to the folder of your project, where the executable file (.exe) is located.
+
+3. Add reference to **NeuralNetwork.dll** file, using the **Reference -> Add Reference** by right-clicking on the **Reference** in **Solution Explorer**.
 
 ### **Step 2**
 
