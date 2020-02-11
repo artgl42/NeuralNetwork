@@ -100,13 +100,13 @@ namespace NeuralNetwork
 
             public Builder SetLearningRate(float learningRate)
             {
-                this.LearningRate = learningRate;
+                LearningRate = learningRate;
                 return this;
             }
 
             public Builder SetMomentumRate(float momentumRate)
             {
-                this.MomentumRate = momentumRate;
+                MomentumRate = momentumRate;
                 return this;
             }
 
