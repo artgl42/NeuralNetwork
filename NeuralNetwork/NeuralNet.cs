@@ -33,10 +33,6 @@ namespace NeuralNetwork
         //private static readonly Logger _Logger = LogManager.GetCurrentClassLogger();
         private LinkedList<ILayer> _NeuralLayers { get; set; }
 
-        // Нужна ли переменная _LastSavedNeuralNetName?
-        //private string _LastSavedNeuralNetName { get; set; }
-        // -----
-
         public ActivationFunc ActivationFunc { get; set; }
         public LearningOptimizing? LearningOptimizing { get; set; }
         public float LearningRate { get; set; }
